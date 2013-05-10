@@ -4,7 +4,8 @@
 import os
 import csv
 import re
-from FileIO import FileIO
+
+import fileio
 
 remove = [u"评价方未及时做出评价",u"系统默认好评",u"`",u".",u"/",u"）",u")",u" ",u"    "]
 
@@ -51,17 +52,6 @@ class SentenceCutter:
             else:
                 d[item] = 1
 
-
-def recordToFile(filename,d):
-    f = open(filename,'w')
-    if isinstance(d,dict):
-        for k,v in d.items():
-            f.write('%s\t\t%d\n'%(k.encode('utf-8','ignore'),v))
-    if isinstance(d,list):
-        for k,v in d:
-            f.write('%s\t\t%d\n'%(k.encode('utf-8','ignore'),v))
-    f.close()
-
 if __name__=="__main__":
     csvPath = "../data/CSV/Train/"
     stringList = []
@@ -83,11 +73,15 @@ if __name__=="__main__":
     #       stringList.append(row[appendIndex])
     #
     #The code above has moved to FileIO.py
-    fileIO = FileIO()
-    stringList = fileIO.readReviewFromAllCSV(csvPath,["reviewContent","appendReview"])
+    stringList = fileio.read_fields_from_allcsv(csvPath,["reviewContent","appendReview"])
 
-    sc = SentenceCutter(stringList)
+    string_list = []
+    for s1,s2 in stringList:
+        string_list.append(s1)
+        string_list.append(s2)
+
+    sc = SentenceCutter(string_list)
     clauseList = sc.cutToClauses()
     clauseDict = sc.recordToDict(clauseList,True)
-    recordToFile('clauseDict.dat',clauseDict)
+    fileio.record_to_file('clauseDict.dat',clauseDict)
     print "finish"

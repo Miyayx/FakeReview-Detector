@@ -14,7 +14,7 @@ from sklearn import metrics
 from sklearn import preprocessing
 from scipy import sparse
 
-from FileIO import FileIO
+import fileio
 
 inputPath='data/'
 ouputPath = 'data/'
@@ -64,9 +64,8 @@ if __name__ == '__main__':
     # get the total amount of clause which appear more than once
     total = os.popen("wc -l %s "%(inputPath+clauseFile)).readline().split(' ')[0]
     total = int(total)+1
-    fio = FileIO()
-    templates = fio.readTemplates(inputPath+inputFile)
-    temp_rids = fio.readFileToDict(inputPath+TEMP_ID_FILE)
+    templates = fileio.read_templates(inputPath+inputFile)
+    temp_rids = fileio.read_file_to_dict(inputPath+TEMP_ID_FILE)
     #print templates[0:3]
     #lb = preprocessing.LabelBinarizer()
     #X = lb.fit_transform(templates)
@@ -76,7 +75,8 @@ if __name__ == '__main__':
     #print type(X[0])
     #print len(X[0])
     start = time.time()
-    rowN = len(templates)
+    #rowN = len(templates)
+    rowN = 5000
     mtx = sparse.lil_matrix((rowN,total))
     for i in range(rowN):
         mtx[i,:] = turnTemplateToVector((templates[i]),total)
@@ -84,14 +84,17 @@ if __name__ == '__main__':
     print mtx.getnnz()
     print mtx.shape[0]
     
-    db = DBSCAN(eps=1.8,min_samples=2).fit(mtx.toarray()[10000:])
+    db = DBSCAN(eps=1.8,min_samples=2).fit(mtx.toarray()[:5000])
     core_samples = db.core_sample_indices_
     labels = db.labels_
     # Number of clusters in labels, ignoring noise if present.
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     print db
     print labels
-    print core_samples
+    for i in range(len(labels)):
+        if labels[i] != -1:
+            print labels[i],i
+    print "core_samples",core_samples
     replicaId = []
     for i in core_samples:
         print i,templates[i]
@@ -104,15 +107,15 @@ if __name__ == '__main__':
         cluster_no = int(labels[i])
         if cluster_no != -1:
             clusters[cluster_no].append(templates[i])
-    print clusters
+    #print clusters
     
     #merge templates in one cluster into a more generic template
     genericTmp = [mergeTmpInCluster(c) for c in clusters]
     print "\n"
-    print genericTmp
+    i#print genericTmp
 
-    fio.recordToFile('data/generic_tmp2.dat',genericTmp)
-    fio.recordToFile('data/replicaId2.dat',replicaId)
+    fileio.record_to_file('data/generic_tmp3.dat',genericTmp)
+    fileio.record_to_file('data/replicaId3.dat',replicaId)
 
 
     #db = DBSCAN(eps=2.5,min_samples=2).fit(mtx.toarray())

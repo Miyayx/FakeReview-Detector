@@ -4,8 +4,8 @@
 """
 """
 import re
-from cutClause import SentenceCutter
-from FileIO import FileIO
+from cutclause import SentenceCutter
+import fileio
 
 regulars = [
     re.compile(ur"[\u4e00-\u9fa5]想象中"),
@@ -18,7 +18,7 @@ regulars = [
     re.compile(ur"第[\u4e00-\u9fa5|0-9]次[[\u4e00-\u9fa5]买|来|光顾][了啊哈]"),
     re.compile(ur"第[\u4e00-\u9fa5|0-9]次[在|来]?[\u4e00-\u9fa5]{2,4}买(?:包|包包|东西)+"),
     re.compile(ur"已经买了[\u4e00-\u9fa5|0-9]个"),
-    re.compile(ur"(?:下次|以后)*还?会[再在]?[来次]?(?:光顾|光临)?的?"),
+    re.compile(ur"(?:下次|以后)*(肯定)?还?会[再在]?[来次]?(?:光顾|光临)?的?"),
     re.compile(ur"[\u4e00-\u9fa5]*一[分|份]价{0,1}钱一[分|份]货"),
     re.compile(ur"以后买包就[\u4e00-\u9fa5]*家了"),
     re.compile(ur"以后就[\u4e00-\u9fa5]*家买[\u4e00-\u9fa5]*了"),
@@ -27,9 +27,11 @@ regulars = [
     re.compile(ur"(已经)?是?第[\u4e00-\u9fa5|0-9]次[\u4e00-\u9fa5]*[买|购买|光顾|来]了?"),
     re.compile(ur"(已经)?是?老(?:顾客|客户)了?"),
     re.compile(ur"[\u4e00-\u9fa5]*很[\u4e00-\u9fa5]*很(?:喜欢|不错)"),
+    re.compile(ur"[\u4e00-\u9fa5]*很(?:喜欢|满意)"),
     re.compile(ur"好评[\u4e00-\u9fa5|0-9]分"),
     re.compile(ur"[\u4e00-\u9fa5]*也?[挺超]?给力[\u4e00-\u9fa5]"),
     re.compile(ur"这个价[格钱]?买到这样的包"),
+    re.compile(ur"这个价[格钱]?(?:很|非常|太)值"),
     re.compile(ur"[\u4e00-\u9fa5]*这个价[格钱]?也?[\u4e00-\u9fa5]{1,3}了"),
     re.compile(ur"包{1,2}[\u4e00-\u9fa5]{2,3}的$"),
     re.compile(ur"[\u4e00-\u9fa5]*是?[帮给][\u4e00-\u9fa5]*[买|带|拍]的"),
@@ -85,17 +87,23 @@ regulars = [
     re.compile(ur"买的[\u4e00-\u9fa5]+色的"),
     re.compile(ur"第?[\u4e00-\u9fa5|0-9]天就收?到了"),
     re.compile(ur"(不好意思)?[\u4e00-\u9fa5]+晚了"),
-    re.compile(ur"没有?让[\u4e00-\u9fa5]+失望"),
+    re.compile(ur"没有?让?[\u4e00-\u9fa5]*失望"),
     re.compile(ur"[\u4e00-\u9fa5]+有点小[\u4e00-\u9fa5]+"),
     re.compile(ur"[\u4e00-\u9fa5]+还是给个好评"),
     re.compile(ur"和[\u4e00-\u9fa5]+一样好"),
     #re.compile(ur"[\u4e00-\u9fa5]+超好"),
-    re.compile(ur"适合[\u4e00-\u9fa5]天")
+    re.compile(ur"适合[\u4e00-\u9fa5]天"),
+    re.compile(ur"走了[\u4e00-\u9fa5|0-9]{1,3}天"),
+    re.compile(ur"[\u4e00-\u9fa5]{1,3}很羡慕"),
+    re.compile(ur"[\u4e00-\u9fa5]*比[\u4e00-\u9fa5]*便宜"),
+    re.compile(ur"(?:多|继续)捧场"),
+    re.compile(ur"很(?:划算|换算)"),
+    re.compile(ur"不要犹豫")
+    re.compile(ur"大爱")
     ]
 if __name__=="__main__":
 
-    fio = FileIO()
-    reviewList = fio.readFieldsFromAllCSV("../data/CSV/Train/",["id","reviewContent"])
+    reviewList = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent"])
     rid_generalratio = {}
     for rid,review in reviewList:
         sc = SentenceCutter(review)

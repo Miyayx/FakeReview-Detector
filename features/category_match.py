@@ -4,14 +4,13 @@
 """
 """
 
-from FileIO import FileIO
+import fileio
 
 CATEGORY_FILE="data/category.dat"
 CLAUSE_FILE="data/clauseDict.dat"
 CATE_SENT_FILE="data/category_sent.dat"
 
 if __name__=='__main__':
-    fio = FileIO()
     sent_cate = {}
     with open(CATEGORY_FILE,'r') as f:
         for line in f.readlines():
@@ -21,7 +20,7 @@ if __name__=='__main__':
             print cate_num
             sent_cate[sentence] = cate_num
 
-    clause_dict = fio.readFileToDict(CATE_SENT_FILE,reverse=True)
+    clause_dict = fileio.read_file_to_dict(CATE_SENT_FILE,reverse=True)
     #clause_dict = dict([k,v] for k,v in clause_dict.iteritems() if v > 2 )
 
 #    new_sent_cate = dict([k,0] for k in clause_dict.keys() )
@@ -38,5 +37,5 @@ if __name__=='__main__':
 
     cate_sent = sorted(new_sent_cate.items(),key=lambda x:x[1],reverse = True)
 
-    fio.recordToFile(CATE_SENT_FILE,[[v,k] for k,v in cate_sent])
+    fileio.record_to_file(CATE_SENT_FILE,[[v,k] for k,v in cate_sent])
 

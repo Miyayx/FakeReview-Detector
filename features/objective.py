@@ -2,16 +2,15 @@
 """
 """
 
-from FileIO import FileIO 
+import fileio 
 FEATURE_PATH = "../data/features/"
 
 if __name__ == "__main__":
-    fio = FileIO()
-    rid_url = fio.readFileToDict(FEATURE_PATH+"url_id_feature.dat")
-    rid_sent = fio.readFileToDict(FEATURE_PATH+"rid_sentratio.dict")
-    rid_general = fio.readFileToDict(FEATURE_PATH+"rid_general.dict")
-    rid_len = fio.readFileToDict(FEATURE_PATH+"rid_lenratio.dict")
-    rid_cate = fio.readFileToDict(FEATURE_PATH+"rid_cateratio.dict")
+    rid_url = fileio.read_file_to_dict(FEATURE_PATH+"url_id_feature.dat")
+    rid_sent = fileio.read_file_to_dict(FEATURE_PATH+"rid_sentratio.dict")
+    rid_general = fileio.read_file_to_dict(FEATURE_PATH+"rid_general.dict")
+    rid_len = fileio.read_file_to_dict(FEATURE_PATH+"rid_lenratio.dict")
+    rid_cate = fileio.read_file_to_dict(FEATURE_PATH+"rid_cateratio.dict",delimiter=None)
     #rid_detailed = fio.readFileToDict()
     
     rid_objective = {}

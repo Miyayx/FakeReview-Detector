@@ -14,7 +14,8 @@ def is_url(s):
 def main(s):
     if is_url(s):
         review_file = ReviewClawler.main(s)
-        FileIO.read
+        fileio.read_fields_from_csv(review_file,'reviewContent')
+
     
 
 

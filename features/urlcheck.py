@@ -1,5 +1,5 @@
 #encoding=utf-8
-from FileIO import FileIO
+import fileio
 
 import re
 import time
@@ -44,5 +44,4 @@ for item in review_train.find():
 
 connection.disconnect()
 
-fio = FileIO()
-fio.recordToFile("../data/features/url_id_feature.dat",d)
+fileio.record_to_file("../data/features/url_id_feature.dat",d)

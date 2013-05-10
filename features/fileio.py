@@ -9,7 +9,7 @@ import os
 import csv
 import codecs
 
-def record_to_file(self,filename,data,mode='w'):
+def record_to_file(filename,data,mode='w'):
     """
     (FileIO,str,data,str) -> NoType
     str is filename
@@ -62,42 +62,16 @@ def record_to_file(self,filename,data,mode='w'):
             f.write('%s\n'%str(item))
     f.close()
 
-def read_review_from_csv(self,path,filename,chosenfields):
-    csvfile = csv.reader(open(path+filename,'r'),delimiter="\t")
-    fieldnames = csvfile.next()
-    fieldIndex = [fieldnames.index(i) for i in chosenfields]
-
-    stringList = []
-    for row in csvfile:
-        for index in fieldIndex:
-            stringList.append(row[index])
-
-    return stringList
-
-def read_review_from_allcsv(self,path,chosenfields):
-    filenames = os.listdir(path)
-    stringList = []
-    for filename in filenames:
-        name = ""
-        if not filename.split(".")[1]=="csv2":
-            continue
-        else:
-            name = filename.split(".")[0]
-        stringList.extend(self.read_review_from_csv(path,filename,chosenfields))
-    return stringList
-
-def read_fields_from_csv(self,path,filename,chosenfields):
+def read_fields_from_csv(path,filename,chosenfields):
     csvfile = csv.reader(open(path+filename,'r'),delimiter="\t")
     fieldnames = csvfile.next()
     fieldIndex = [fieldnames.index(i) for i in chosenfields]
 
     stringList = [[row[i] for i in fieldIndex] for row in csvfile]
-    #for row in csvfile:
-    #    for index in fieldIndex:
-    #        stringList.append(row[index])
+
     return stringList
 
-def read_fields_from_allcsv(self,path,chosenfields):
+def read_fields_from_allcsv(path,chosenfields):
     filenames = os.listdir(path)
     stringList = []
     for filename in filenames:
@@ -106,10 +80,10 @@ def read_fields_from_allcsv(self,path,chosenfields):
             continue
         else:
             name = filename.split(".")[0]
-        stringList.extend(self.read_fields_from_csv(path,filename,chosenfields))
+        stringList.extend(read_fields_from_csv(path,filename,chosenfields))
     return stringList
 
-def read_file_to_dict(self,filename,reverse=False,delimiter='\t\t'):
+def read_file_to_dict(filename,reverse=False,delimiter='\t\t'):
     with open(filename,'r') as f:
         d = {}
         for l in f.readlines():
@@ -122,7 +96,7 @@ def read_file_to_dict(self,filename,reverse=False,delimiter='\t\t'):
                 d[k] = eval(v)
     return d
 
-def read_file_to_list(self,filename):
+def read_file_to_list(filename):
     """
     str(filename) -> list
     Read each line in the file and add each line into a list
@@ -130,7 +104,7 @@ def read_file_to_list(self,filename):
     with open(filename,'r') as f:
         return [line.strip('\n') for line in f.readlines()]
 
-def read_templates(self,filename):
+def read_templates(filename):
     """
     str(filename) -> list of tuple
     """
