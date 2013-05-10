@@ -1,0 +1,6 @@
+running build_ext
+building '_nlpirpy' extension
+swigging nlpir.i to nlpir_wrap.c
+swig -python -o nlpir_wrap.c nlpir.i
+gcc -pthread -fno-strict-aliasing -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_GNU_SOURCE -fPIC -fwrapv -DNDEBUG -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_GNU_SOURCE -fPIC -fwrapv -fPIC -I/usr/include/python2.7 -c nlpir_wrap.c -o build/temp.linux-x86_64-2.7/nlpir_wrap.o
+Build Complete!
