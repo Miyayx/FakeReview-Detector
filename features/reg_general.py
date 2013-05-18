@@ -33,11 +33,10 @@ regulars = [
     re.compile(ur"这个价[格钱]?买到这样的包"),
     re.compile(ur"这个价[格钱]?(?:很|非常|太)值"),
     re.compile(ur"[\u4e00-\u9fa5]*这个价[格钱]?也?[\u4e00-\u9fa5]{1,3}了"),
-    re.compile(ur"包{1,2}[\u4e00-\u9fa5]{2,3}的$"),
+    #re.compile(ur"包{1,2}[\u4e00-\u9fa5]{2,3}的$"),
     re.compile(ur"[\u4e00-\u9fa5]*是?[帮给][\u4e00-\u9fa5]*[买|带|拍]的"),
     re.compile(ur"买来?[送|给][\u4e00-\u9fa5]*的?"),
     re.compile(ur"[\u4e00-\u9fa5]*不影响[整体|使用|美观]+"),
-    re.compile(ur"[\u4e00-\u9fa5]*也?是我想要的"),
     re.compile(ur"[与跟和](?:卖家|买家|老板|店主)+描述[的得](基本)?(?:一致|一样)"),
     re.compile(ur"就是[\u4e00-\u9fa5]*不[太大]好"),
     re.compile(ur"(?:就是|只是|不过)[\u4e00-\u9fa5]+有点?[\u4e00-\u9fa5]*"),
@@ -56,7 +55,7 @@ regulars = [
     re.compile(ur"[\u4e00-\u9fa5]{1,4}买了[\u4e00-\u9fa5]{1,3}个包{0,2}"),
     re.compile(ur"这家比其他的返利网要返的[\u4e00-\u9fa5]*很多"),
     re.compile(ur"双[\u4e00-\u9fa5]*买的"),
-    re.compile(ur"是我(?:喜欢|想象|想像|想要)+的[\u4e00-\u9fa5]*"),
+    re.compile(ur"[\u4e00-\u9fa5]*也?是我(?:喜欢|想象|想像|想要)+的[\u4e00-\u9fa5]*"),
     re.compile(ur"[很|非常][\u4e00-\u9fa5]*的一款包"),
     re.compile(ur"[\u4e00-\u9fa5]*可以[\u4e00-\u9fa5]*很多东西"),
     re.compile(ur"[\u4e00-\u9fa5]+就(?:好|行|可以|没事|可以)了$"),
@@ -98,7 +97,7 @@ regulars = [
     re.compile(ur"[\u4e00-\u9fa5]*比[\u4e00-\u9fa5]*便宜"),
     re.compile(ur"(?:多|继续)捧场"),
     re.compile(ur"很(?:划算|换算)"),
-    re.compile(ur"不要犹豫")
+    re.compile(ur"不要犹豫"),
     re.compile(ur"大爱")
     ]
 if __name__=="__main__":

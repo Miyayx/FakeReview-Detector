@@ -47,14 +47,30 @@ def get_category_count(cate_word,review):
         count += 1
     return count
 
-if __name__ == "__main__":
+def category_value(reviews):
+    """
+    list(list of review) -> list(list of value)
+    dict(id:review) -> dict(id:value)
+    string -> int
+    """
+    avg = 2.4379 
     cate_word = read_target_word()
-    #for k in cate_word.keys():
-    #    print k
+    if isinstance(reviews,str):
+        return get_category_count(cate_word,review)/avg
+    elif isinstance(reviews,list):
+        cate_v = [get_category_count(cate_word,r) for r in reviews]
+        avg = float(sum(cate_v))/len(reviews)
+        return [v/avg for v in cate_v]
+    elif isinstance(reviews,dict):
+        rid_cate = dict([rid,get_category_count(cate_word,review)] for rid,review in reviews.items())
+        avg = float(sum(rid_cate.values()))/len(rid_cate)
+        return dict([k,v/avg] for k,v in rid_cate.items())
+        
+
+if __name__ == "__main__":
     reviewList = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent"])
-    rid_cate = dict([rid,get_category_count(cate_word,review)] for rid,review in reviewList)
-    avg = float(sum(rid_cate.values()))/len(rid_cate)
-    print "avg",avg
-    for rid,review in reviewList:
-        print "%s\t\t%f"%(rid,rid_cate[rid]/avg)
+    rid_review = dict(reviewList)
+    rid_cate = category_value(rid_review)
+    for rid,value in rid_cate.items():
+        print "%s\t\t%f"%(rid_review[rid],value)
 

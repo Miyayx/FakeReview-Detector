@@ -11,21 +11,21 @@ import codecs
 import matplotlib.pyplot as plt
 import numpy as np
 sys.path.append('/home/yang/GraduationProject/features/')
-from FileIO import FileIO 
-from ltpXML import ltpXML
-from cutClause import SentenceCutter as SC
+import fileio 
+from ltp_xml import ltpXML
+from cutclause import SentenceCutter as SC
  
 sentWordPath = '../data/WordSent/'
-fio = FileIO() 
-pos_adj = fio.readFileToList(sentWordPath+'positive.dat')
-neg_adj = fio.readFileToList(sentWordPath+'negative.dat')
-neg_adv = fio.readFileToList(sentWordPath+'negative_adv.dat')
-adv_degree = fio.readFileToDict(sentWordPath+'adv_degree.dat')
+pos_adj = fileio.read_file_to_list(sentWordPath+'positive.dat')
+neg_adj = fileio.read_file_to_list(sentWordPath+'negative.dat')
+neg_adv = fileio.read_file_to_list(sentWordPath+'negative_adv.dat')
+adv_degree = fileio.read_file_to_list(sentWordPath+'adv_degree.dat')
 
 XML_FILE="../data/parser/all_clause_parse_utf8.dat"
 
 subject_paths = ["ADV@ADV@HED@MT","ADV@HED@VOB@MT","ADV@POB@HED@MT","HED@VOB@VOB@MT","QUN@ADV@ADV@HED@MT","QUN@ATT@HED","DE@VOB@HED","HED@SBV@DE@ATT@VOB","HED@MT@QUN@VOB@MT","QUN@HED","HED@CMP@MT","HED@MT@QUN@VOB","ADV@HED@MT@QUN@VOB","QUN@ADV@HED@MT"]
 
+   
 def read_xml_to_dict(xml_file):
     """
     str->dict(sentence,xmlstring)
@@ -116,13 +116,30 @@ def calculate_clause_sent(c_ltp):
             return polar
         else: return 0
 
+def sentiment_value(reviews):
+    """
+    list(list of review) -> list(list of value)
+    dict(id:review) -> dict(id:value)
+    string -> int
+    """
+    avg = 1
+    clause_xml = read_xml_to_dict(XML_FILE)
+    if isinstance(reviews,str):
+        return calculate_review_sent(reviews)/avg
+    elif isinstance(reviews,list):
+        sent_v = [calculate_review_sent(clause_xml,r) for r in reviews]
+        avg = float(sum(sent_v))/len(sent_v)
+        return [v/avg for v in sent_v]
+    elif isinstance(reviews,dict):
+        rid_sent = dict([rid,calculate_review_sent(clause_xml,review)] for rid,review in reviews.items())
+        avg = float(sum(rid_sent.values()))/len(rid_sent)
+        return dict([k,v/avg] for k,v in rid_sent.items())
+
+
 REVIEW_PATH = "../data/CSV/Train/"
 FEATURE_PATH = "../data/features/"
+
 if __name__ == "__main__":
-    clause_xml = read_xml_to_dict(XML_FILE)
-    #for clause,xml_str in clause_xml.iteritems():
-    #    c_ltp = ltpXML(clause,xml_str)
-        #print clause,calculate_clause_sent(c_ltp)
     review_sentratio = {}
     rid_sentratio = {}
     filenames = os.listdir(REVIEW_PATH)
@@ -132,14 +149,14 @@ if __name__ == "__main__":
             continue
         else:
             name = filename.split(".")[0]
-        reviewList = fio.readFieldsFromCSVToList(REVIEW_PATH,filename,["id","reviewContent"])
-        rid_sent = dict([rid,calculate_review_sent(clause_xml,review)] for rid,review in reviewList)    
-        review_sent = dict([review,rid_sent[rid]] for rid,review in reviewList)
-        avg_sent = float(sum(rid_sent.values()))/len(rid_sent)
-        rid_sentratio.update(dict([k,v/avg_sent] for k,v in rid_sent.iteritems()))
-        review_sentratio.update(dict([k,v/avg_sent] for k,v in review_sent.iteritems()))
+        reviewList = fileio.read_fields_from_csv(REVIEW_PATH,filename,["id","reviewContent"])
+        reviewdict = dict(reviewList)
+        temp_rid_sentratio = sentiment_value(reviewdict)
+        review_sentratio.update(dict([reviewdict[k],v] for k,v in temp_rid_sentratio.iteritems()))
 
-    fio.recordToFile(FEATURE_PATH+"rid_sentratio.dict",rid_sentratio)
+        rid_sentratio.update(temp_rid_sentratio)
+
+    #fileio.record_to_file(FEATURE_PATH+"rid_sentratio.dict",rid_sentratio)
 
     for k,v in review_sentratio.items():
         print k,v

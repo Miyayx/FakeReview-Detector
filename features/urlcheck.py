@@ -4,44 +4,62 @@ import fileio
 import re
 import time
 from pymongo import MongoClient
-connection = MongoClient()
-reviewdb = connection['reviewdb']
-review_train = reviewdb['review_train']
 
-#urlRexExp = re.compile('([a-zA-Z]+|{[0-9]+[a-zA-Z]+}+[a-zA-Z]*|{[a-zA-Z]+[0-9]+}+[0-9]*)\.[a-z0-9-A-Z]+'.decode('utf-8'))
-#urlRexExp = re.compile(r'[a-zA-Z]+[0-9]*\.[a-z0-9-A-Z]+'.decode('utf-8'))
-urlRexExp = re.compile(r'\.com|\.net|\.cn|\.COM|\.CN|\.NET'.decode('utf-8'))#re.l忽略大小写
-spaceExp = re.compile(r'\s')
-count = 0
-d = {}
-l = []
-for item in review_train.find():
-    item_id = item['itemId']
+def has_url(review):
+    #urlRexExp = re.compile('([a-zA-Z]+|{[0-9]+[a-zA-Z]+}+[a-zA-Z]*|{[a-zA-Z]+[0-9]+}+[0-9]*)\.[a-z0-9-A-Z]+'.decode('utf-8'))
+    #urlRexExp = re.compile(r'[a-zA-Z]+[0-9]*\.[a-z0-9-A-Z]+'.decode('utf-8'))
+    urlRexExp = re.compile(r'\.com|\.net|\.cn|\.COM|\.CN|\.NET|QQ|Q群'.decode('utf-8'))#re.l忽略大小写
+    spaceExp = re.compile(r'\s')
+    return True if urlRexExp.search(spaceExp.sub('',review).lower()) else False
+
+def url_value(reviews):
+    if isinstance(reviews,str):
+        return int(has_url(reviews))
+    elif isinstance(reviews,list):
+        return [int(has_url(r)) for r in reviews]
+    elif isinstance(reviews,dict):
+        return dict([k,int(has_url(r))] for k,r in reviews.items())
+
+if __name__ == "__main__":
+    connection = MongoClient()
+    reviewdb = connection['reviewdb']
+    review_train = reviewdb['review_train']
     
-    for review in item['reviews']:
-        r_id = review['id']
-        content = review['reviewContent']
-        append = review['appendReview']
-#first remove all the space,then match regular
-        if urlRexExp.search(spaceExp.sub('',content).lower()) or urlRexExp.search(spaceExp.sub('',append).lower()):
-            #d[r_id] = content+"\t\t"+append+"\n"
-            d[r_id] = 1
-            #print "review: %s"%content.encode('utf-8','ignore')
-            #print "append: %s\n"%append.encode('utf-8','ignore')
-            #time.sleep(0.5)
-        else: d[r_id] = 0
-            #pass
+    count = 0
+    d = {}
+    l = []
+    for item in review_train.find():
+        item_id = item['itemId']
+        
+        for review in item['reviews']:
+            r_id = review['id']
+            content = review['reviewContent']
+            append = review['appendReview']
+    #first remove all the space,then match regular
+            if has_url(content) or has_url(append):
+                #d[r_id] = content+"\t\t"+append+"\n"
+                d[r_id] = 1
+                print "review: %s"%content.encode('utf-8','ignore')
+                print "append: %s\n"%append.encode('utf-8','ignore')
+                #time.sleep(0.5)
+            else: d[r_id] = 0
+                #pass
+    
+           # if len(content) > 0:
+           #     print content
+           #     print "\n"
+           #     time.sleep(0.3)
+           # if len(append) > 0:
+           #     print append
+           #     print "\n"
+           #     time.sleep(0.3)
+           #     
+    
+    #for k,v in d.items():
+    #    print "%s\t\t%d"%(k,v)
 
-       # if len(content) > 0:
-       #     print content
-       #     print "\n"
-       #     time.sleep(0.3)
-       # if len(append) > 0:
-       #     print append
-       #     print "\n"
-       #     time.sleep(0.3)
-       #     
+    connection.disconnect()
+    
+    #fileio.record_to_file("../data/features/url_id_feature.dat",d)
 
-connection.disconnect()
 
-fileio.record_to_file("../data/features/url_id_feature.dat",d)
