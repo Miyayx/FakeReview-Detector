@@ -102,7 +102,7 @@ def read_file_to_list(filename):
     Read each line in the file and add each line into a list
     """
     with open(filename,'r') as f:
-        return [line.strip('\n') for line in f.readlines()]
+        return [eval(line.strip('\n')) for line in f.readlines()]
 
 def read_templates(filename):
     """

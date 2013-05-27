@@ -20,6 +20,14 @@ iris = datasets.load_iris()
 X = iris.data[:, :2]  # we only take the first two features.
 Y = iris.target
 
+print X
+print Y
+print type(X)
+print type(Y)
+print len(X)
+print len(Y)
+
+
 h = .02  # step size in the mesh
 
 logreg = linear_model.LogisticRegression(C=1e5)

@@ -5,10 +5,11 @@
 This is the entrance of the whole project
 """
 
-import ReviewClawler
-import fileio
+import ReviewCrawler
+from features import fileio
 
 from features.cutclause import SentenceCutter as SC
+
 
 def is_url(s):
     return True if s.startswith("http://") else False
@@ -38,7 +39,11 @@ def _get_reviews(s):
         else:
             rid_review[0] = s
     else:
-        raise: ParameterTypeError 
+        raise ParameterTypeError 
+    return rid_review
+
+review_list_obj = {}
+review_obj = {}
 
 def fake_detect(s):
     """
@@ -55,24 +60,29 @@ def fake_detect(s):
         return
 
     #Url checking
-    import urlcheck from features
+    from features import urlcheck 
     rid_url = urlcheck.url_value(rid_review)
+    print "rid_url",rid_url
 
     #Sentiment analysis
-    import review_sent from sentiment_analysis
+    from sentiment_analysis import review_sent 
     rid_sent = review_sent.sentiment_value(rid_review)
+    print "rid_sent",rid_sent
 
     #General Sentence
-    import reg_general from features
+    from features import reg_general 
     rid_general = general_value(rid_review)
+    print "rid_general",rid_general
 
     #Category
-    import detail_category from detail_description
+    from detail_description import detail_category 
     rid_cate = detail_category.category_value(rid_review)
+    print "rid_cate",rid_cate
 
     #Length
-    import review_len from detail_description
+    from detail_description import review_len 
     rid_len = review_len.length_value(rid_review)
+    print "rid_len",rid_len
 
     #Logistic regression
 
@@ -81,6 +91,9 @@ def fake_detect_test():
 
         
 if __name__ == "__main__":
-    fake_detect()
+    reviews = [
+    "很好的包包，已经第二次买了，全5分",
+    "还可以，没有图片上的好看，皮质还可以的，物流也挺快的三天就到了,总体上还算挺满意得。"]
+    fake_detect(reviews)
 
     

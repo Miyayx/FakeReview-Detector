@@ -8,7 +8,7 @@ import fileio
 
 #ID_FILE='../havealook/highSentiment_id.dat'
 #ID_FILE='../havealook/replica_review.dat'
-ID_FILE='data/replicaId3.dat'
+ID_FILE='../data/target/all_replicaId.dat'
 #ID_FILE='data/replicaId2.dat'
 #ID_FILE='lowresult.dat'
 #ID_FILE='data/replica_high_freq.dat'
@@ -46,6 +46,7 @@ def id_to_review(id_file):
     for rid in id_list:
         if rid in same:
             continue
+        rid = str(rid)
         print rid
         print rid_review[rid]
         print rid_time[rid]

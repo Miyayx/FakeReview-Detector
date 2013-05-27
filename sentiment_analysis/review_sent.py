@@ -10,18 +10,21 @@ import os
 import codecs
 import matplotlib.pyplot as plt
 import numpy as np
+
+import ltp_parser
+
 sys.path.append('/home/yang/GraduationProject/features/')
 import fileio 
 from ltp_xml import ltpXML
 from cutclause import SentenceCutter as SC
+
  
-sentWordPath = '../data/WordSent/'
+sentWordPath = '/home/yang/GraduationProject/data/WordSent/'
 pos_adj = fileio.read_file_to_list(sentWordPath+'positive.dat')
 neg_adj = fileio.read_file_to_list(sentWordPath+'negative.dat')
 neg_adv = fileio.read_file_to_list(sentWordPath+'negative_adv.dat')
 adv_degree = fileio.read_file_to_list(sentWordPath+'adv_degree.dat')
 
-XML_FILE="../data/parser/all_clause_parse_utf8.dat"
 
 subject_paths = ["ADV@ADV@HED@MT","ADV@HED@VOB@MT","ADV@POB@HED@MT","HED@VOB@VOB@MT","QUN@ADV@ADV@HED@MT","QUN@ATT@HED","DE@VOB@HED","HED@SBV@DE@ATT@VOB","HED@MT@QUN@VOB@MT","QUN@HED","HED@CMP@MT","HED@MT@QUN@VOB","ADV@HED@MT@QUN@VOB","QUN@ADV@HED@MT"]
 
@@ -116,23 +119,35 @@ def calculate_clause_sent(c_ltp):
             return polar
         else: return 0
 
-def sentiment_value(reviews):
+def sentiment_value(reviews,xml_file=None):
     """
     list(list of review) -> list(list of value)
     dict(id:review) -> dict(id:value)
     string -> int
     """
+    if not xml_file:
+        if isinstance(reviews,dict):
+            ltp = ltp_parser.LTPParser(reviews.values())
+        else:
+            ltp = ltp_parser.LTPParser(reviews)
+        ltp.cut()
+        ltp.ltp_parser()
+        xml_file = ltp_parser.PARSER_RESULT
     avg = 1
-    clause_xml = read_xml_to_dict(XML_FILE)
+    clause_xml = read_xml_to_dict(xml_file)
     if isinstance(reviews,str):
         return calculate_review_sent(reviews)/avg
     elif isinstance(reviews,list):
         sent_v = [calculate_review_sent(clause_xml,r) for r in reviews]
         avg = float(sum(sent_v))/len(sent_v)
+        if avg == 0:
+            avg = 1
         return [v/avg for v in sent_v]
     elif isinstance(reviews,dict):
         rid_sent = dict([rid,calculate_review_sent(clause_xml,review)] for rid,review in reviews.items())
         avg = float(sum(rid_sent.values()))/len(rid_sent)
+        if avg == 0:
+            avg = 1
         return dict([k,v/avg] for k,v in rid_sent.items())
 
 
@@ -140,6 +155,8 @@ REVIEW_PATH = "../data/CSV/Train/"
 FEATURE_PATH = "../data/features/"
 
 if __name__ == "__main__":
+
+    XML_FILE="../data/parser/all_clause_parse_utf8.dat"
     review_sentratio = {}
     rid_sentratio = {}
     filenames = os.listdir(REVIEW_PATH)
@@ -151,7 +168,7 @@ if __name__ == "__main__":
             name = filename.split(".")[0]
         reviewList = fileio.read_fields_from_csv(REVIEW_PATH,filename,["id","reviewContent"])
         reviewdict = dict(reviewList)
-        temp_rid_sentratio = sentiment_value(reviewdict)
+        temp_rid_sentratio = sentiment_value(reviewdict,XML_FILE)
         review_sentratio.update(dict([reviewdict[k],v] for k,v in temp_rid_sentratio.iteritems()))
 
         rid_sentratio.update(temp_rid_sentratio)

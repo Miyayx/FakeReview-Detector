@@ -100,6 +100,9 @@ regulars = [
     re.compile(ur"不要犹豫"),
     re.compile(ur"大爱")
     ]
+
+def general_value(reviews):
+    
 if __name__=="__main__":
 
     reviewList = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent"])

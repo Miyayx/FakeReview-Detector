@@ -13,6 +13,8 @@ from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn import preprocessing
 from scipy import sparse
+from scipy.spatial import distance
+from sklearn.metrics.pairwise import pairwise_distances
 
 import fileio
 
@@ -75,16 +77,37 @@ if __name__ == '__main__':
     #print type(X[0])
     #print len(X[0])
     start = time.time()
-    #rowN = len(templates)
-    rowN = 5000
-    mtx = sparse.lil_matrix((rowN,total))
-    for i in range(rowN):
-        mtx[i,:] = turnTemplateToVector((templates[i]),total)
-    print time.time()-start
-    print mtx.getnnz()
-    print mtx.shape[0]
+    rowN = len(templates)
+    begin = 10000
+    rowN = rowN-begin
+
+    vectors = [turnTemplateToVector((templates[i]),total) for i in range(begin,begin+rowN)]
+    print "vector -> array"
+    vectors = np.array(vectors)
+    print "calculate distance"
+    dist = pairwise_distances(vectors,metric="jaccard")
+
+    #dist = [[0] * rowN] * rowN
+    #for i in range(rowN):
+    #    for j in range(rowN):
+    #        dist[i][j] = distance.jaccard(vectors[i],vectors[j])
+  #          print vectors[i]
+  #          print vectors[j]
+  #          print dist[i][j]
+    #        print "i",i,"j",j
+    #        j += 1
+    #    i += 1
+    #print dist
+
+    #mtx = sparse.lil_matrix((rowN,total))
+    #for i in range(rowN):
+    #    mtx[i,:] = turnTemplateToVector((templates[i]),total)
+    #print time.time()-start
+    #print mtx.getnnz()
+    #print mtx.shape[0]
     
-    db = DBSCAN(eps=1.8,min_samples=2).fit(mtx.toarray()[:5000])
+    print "Begin DBSCAN"
+    db = DBSCAN(eps=0.4,min_samples=2,metric="precomputed").fit(dist)
     core_samples = db.core_sample_indices_
     labels = db.labels_
     # Number of clusters in labels, ignoring noise if present.
@@ -97,8 +120,13 @@ if __name__ == '__main__':
     print "core_samples",core_samples
     replicaId = []
     for i in core_samples:
-        print i,templates[i]
-        replicaId+=temp_rids[(templates[i])]
+        try:
+            index = core_samples.index(i)
+            j = core_samples[index+1]
+            print begin+i,templates[begin+i],dist[i][j]
+        except:
+            print begin+i,templates[begin+i]
+        replicaId+=temp_rids[(templates[begin+i])]
     print n_clusters_
 
     #arrange samples into a list of cluster
@@ -106,16 +134,16 @@ if __name__ == '__main__':
     for i in range(len(labels)):
         cluster_no = int(labels[i])
         if cluster_no != -1:
-            clusters[cluster_no].append(templates[i])
+            clusters[cluster_no].append(templates[begin+i])
     #print clusters
     
     #merge templates in one cluster into a more generic template
     genericTmp = [mergeTmpInCluster(c) for c in clusters]
     print "\n"
-    i#print genericTmp
+    #print genericTmp
 
-    fileio.record_to_file('data/generic_tmp3.dat',genericTmp)
-    fileio.record_to_file('data/replicaId3.dat',replicaId)
+    fileio.record_to_file('data/new_generic_tmp2.dat',genericTmp)
+    fileio.record_to_file('data/new_replicaId2.dat',replicaId)
 
 
     #db = DBSCAN(eps=2.5,min_samples=2).fit(mtx.toarray())

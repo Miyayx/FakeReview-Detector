@@ -10,7 +10,7 @@ from cutclause import SentenceCutter as SC
 
 if __name__=="__main__":
     rid_result = fileio.read_file_to_dict("objective.temp")
-    replica = fileio.read_file_to_list("data/replicaId3.dat")
+    replica = fileio.read_file_to_list("../data/target/all_replicaId.dat")
     #replica = fileio.read_file_to_list("data/replica_high_freq.dat")
 
     review_list = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent"])
@@ -20,6 +20,7 @@ if __name__=="__main__":
     count = 0
     longreview = 0
     for i in replica:
+        i = str(i)
         review = rid_review[i]
         sc = SC(review)
         if len(sc.cutToClauses()) <= 3:

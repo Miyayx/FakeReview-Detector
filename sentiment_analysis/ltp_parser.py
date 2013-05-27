@@ -11,8 +11,8 @@ import convert_coding
 sys.path.append('/home/yang/GraduationProject/features/')
 from cutclause import SentenceCutter as SC
 
-SENTENCE_FILE = "../data/parser/ltp_parser_sentence.dat"
-PARSER_RESULT = "../data/parser/ltp_parser_result.dat"
+SENTENCE_FILE = "/home/yang/GraduationProject/data/parser/ltp_parser_sentence.dat"
+PARSER_RESULT = "/home/yang/GraduationProject/data/parser/ltp_parser_result_utf8.dat"
 
 class LTPParser:
     """
@@ -30,13 +30,12 @@ class LTPParser:
     def cut(self):
         sc = SC(self.str_list)
         clauses = sc.cutToClauses()
-        with open(SENTENCE_FILE,'w') as f:
+        with codecs.open(SENTENCE_FILE,'w','gb2312') as f:
             for c in clauses:
-                f.write(c.encode('utf-8')+"\n")
+                f.write(c+"\n")
         
     def ltp_parser(self):
-        os.system("../ltp/bin")
-        os.system("./ltp_test all %s > %s"%(SENTENCE_FILE,PARSER_RESULT))
+        os.system("sh /home/yang/GraduationProject/ltp/bin/ltp_test.sh")
         convert_coding.convert_encoding(PARSER_RESULT,"utf-8")
 
 
