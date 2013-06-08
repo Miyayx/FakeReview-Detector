@@ -6,20 +6,19 @@
 
 import fileio
 
-#ID_FILE='../havealook/highSentiment_id.dat'
-#ID_FILE='../havealook/replica_review.dat'
-ID_FILE='../data/target/all_replicaId.dat'
-#ID_FILE='data/replicaId2.dat'
-#ID_FILE='lowresult.dat'
-#ID_FILE='data/replica_high_freq.dat'
+#DICT_FILE='../data/features/rid_lenratio.dict'
+#DICT_FILE='../data/features/rid_lennorm.dict'
+#DICT_FILE='../data/features/rid_sentratio.dict'
+#DICT_FILE='../data/features/rid_sentnorm.dict'
+#DICT_FILE='../data/features/rid_general.dict'
+#DICT_FILE='../data/features/rid_cateratio.dict'
+DICT_FILE='../data/features/rid_third.dict'
 
 def getIdList(l):
     return [item.strip("\n").split("\t\t")[0] for item in l]
 
 def id_to_review(id_file):
 
-    #rid_objective = fileIO.readFileToDict("../data/features/rid_objective.dict")
-    #id_list = getIdList(fileIO.readFileToList("../data/features/rid_objective.dict"))
     reviewList = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent","reviewTime","userNick"])
 
     userandtime_rid = {}
@@ -35,15 +34,12 @@ def id_to_review(id_file):
     rid_time = dict([rid,time]for rid,review,time,user in reviewList)
     rid_user = dict([rid,user]for rid,review,time,user in reviewList)
     
-    
-    #rid_review = dict([rid,review] for rid,review in reviewList)
-    
     #for rid in id_list:
     #    print rid_review[rid],rid_objective[int(rid)],"\n"
     
-    id_list = fileio.read_file_to_list(id_file)
-
-    for rid in id_list:
+    id_result = fileio.read_file_to_dict(id_file)
+    id_result = sorted(id_result.items(),key=lambda x:x[1],reverse = True)
+    for rid,result in id_result:
         if rid in same:
             continue
         rid = str(rid)
@@ -51,7 +47,9 @@ def id_to_review(id_file):
         print rid_review[rid]
         print rid_time[rid]
         print rid_user[rid]
+        print "result",result
         print "============================="
+
     
 if __name__ == '__main__':
-    id_to_review(ID_FILE)
+    id_to_review(DICT_FILE)

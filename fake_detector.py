@@ -6,20 +6,27 @@ This is the entrance of the whole project
 """
 
 import ReviewCrawler
-from features import fileio
+from utils import fileio
+from utils import jsonparser
 
-from features.cutclause import SentenceCutter as SC
+from utils.cutclause import SentenceCutter as SC
+from utils.ltp.ltp_parser import LTPParser
 
+import objective
+
+REVIEW_LIST = []
 
 def is_url(s):
     return True if s.startswith("http://") else False
 
 def is_file(s):
-    return True if s.endswith(".csv") else False
+    return True if s.find(".csv") != -1 else False
 
 def _get_reviews_from_file(filedir):
+    global REVIEW_LIST
+    REVIEW_LIST = fileio.read_fields_from_csv(filedir,['id','reviewContent','userNick','reviewTime'])
     rid_review = fileio.read_fields_from_csv(filedir,['id','reviewContent'])
-    return dict([rid,r])
+    return dict(rid_review)
 
 def _get_reviews_from_url(url):
     r_file = ReviewClawler.main(s)
@@ -33,9 +40,9 @@ def _get_reviews(s):
             rid_review[i] = s[i]
     elif isinstance(s,str):
         if is_url(s):
-            rid_review = get_reviews_from_url(s)
+            rid_review = _get_reviews_from_url(s)
         elif is_file(s):
-            rid_review = get_reviews_from_file(s)
+            rid_review = _get_reviews_from_file(s)
         else:
             rid_review[0] = s
     else:
@@ -45,6 +52,107 @@ def _get_reviews(s):
 review_list_obj = {}
 review_obj = {}
 
+def ltp_parse(reviewlistobj,rid_reviewobj):
+    all_clauses = []
+    for reviewobj in rid_reviewobj.values():
+        all_clauses+=reviewobj["clauses"]
+    all_clauses = set(all_clauses)
+    ltp = LTPParser(all_clauses,cutted=True)
+    reviewlistobj["parser_path"] = ltp.ltp_parser()
+
+def cut_clause(string):
+    sc = SC(string)
+    return sc.cutToClauses()
+
+from features import urlcheck 
+from sentiment_analysis import review_sent 
+from features import reg_general 
+from detail_description import detail_category 
+from detail_description import review_len 
+
+rule_procs = [
+    urlcheck.url_proc,
+    reg_general.general_proc,
+    detail_category.category_proc,
+    review_len.length_proc,
+    review_sent.sentiment_proc
+]
+
+def print_reviewobj(reviewobj):
+    print "=================================="
+    print reviewobj["content"]
+    print "url",reviewobj["url"]
+    print "sentiment",reviewobj["sentiment"]
+    print "general",reviewobj["general"]
+    print "length",reviewobj["length"]
+    print "category",reviewobj["category"]
+
+def fake_detect_pipeline(s):
+    """
+    The entrance of whole project
+    Parameter can be :product page url from Taobao/Tmall
+                      csv file(with review information) dir
+                      a review string
+                      a review list
+
+    This method use design pattern of pipeline. Use dict instead of Class. rid_reiviewobj is a dict of reviewobj, a reviewobj store all attributes it needs. reviewlistobj stores attributes needed when calculating but relative the whole review list.
+
+    reviewobj = {
+        "content":
+        "url":
+        "general":
+        "category":
+        "length":
+        "sentiment":
+        "clauses":
+        }
+
+    reviewlistobj = {
+        "parser_path":
+        "clause_xml"
+        "avg_length":
+        "avg_sent":
+        }
+    """
+    rid_review = _get_reviews(s) #It's a dict, which key is id from web of review and value is content of review
+    #except ParameterTypeError:
+
+    rid_reviewobj = {}
+    reviewlistobj = {}
+
+    for rid,review in rid_review.items():
+        rid_reviewobj[rid] = {}
+        rid_reviewobj[rid]["content"] = review
+        rid_reviewobj[rid]["clauses"] = cut_clause(review)
+
+    ltp_parse(reviewlistobj,rid_reviewobj)
+
+    reviewlistobj["clause_xml"] = review_sent.read_xml_to_dict(reviewlistobj["parser_path"])
+
+    for rid in rid_reviewobj.keys():
+        reviewobj = rid_reviewobj[rid]
+        for proc in rule_procs[:-1]:
+            proc(reviewobj)
+        rule_procs[-1](reviewobj,reviewlistobj)
+
+    avg_len = sum([obj["length"] for obj in rid_reviewobj.values()])/float(len(rid_reviewobj))
+    avg_sent = sum([obj["sentiment"] for obj in rid_reviewobj.values()])/float(len(rid_reviewobj))
+
+    for rid in rid_reviewobj.keys():
+        rid_reviewobj[rid]["length"] = rid_reviewobj[rid]["length"]/avg_len
+        rid_reviewobj[rid]["sentiment"] = rid_reviewobj[rid]["sentiment"]/avg_len
+
+    rid_target = {}
+    for rid in rid_reviewobj.keys():
+        reviewobj = rid_reviewobj[rid]
+        #print_reviewobj(reviewobj)
+        #print "Result",objective.objective(reviewobj)
+        rid_target[eval(rid)] = objective.objective(reviewobj)
+    print "Review_list",len(REVIEW_LIST)
+    print "rid_target",len(rid_target)
+
+    return jsonparser.convert_to_json(REVIEW_LIST,rid_target)
+        
 def fake_detect(s):
     """
     The entrance of whole project
@@ -60,31 +168,27 @@ def fake_detect(s):
         return
 
     #Url checking
-    from features import urlcheck 
     rid_url = urlcheck.url_value(rid_review)
     print "rid_url",rid_url
 
     #Sentiment analysis
-    from sentiment_analysis import review_sent 
     rid_sent = review_sent.sentiment_value(rid_review)
     print "rid_sent",rid_sent
 
     #General Sentence
-    from features import reg_general 
     rid_general = general_value(rid_review)
     print "rid_general",rid_general
 
     #Category
-    from detail_description import detail_category 
     rid_cate = detail_category.category_value(rid_review)
     print "rid_cate",rid_cate
 
     #Length
-    from detail_description import review_len 
     rid_len = review_len.length_value(rid_review)
     print "rid_len",rid_len
 
     #Logistic regression
+
 
 def fake_detect_test():
     pass
@@ -94,6 +198,7 @@ if __name__ == "__main__":
     reviews = [
     "很好的包包，已经第二次买了，全5分",
     "还可以，没有图片上的好看，皮质还可以的，物流也挺快的三天就到了,总体上还算挺满意得。"]
-    fake_detect(reviews)
+    csvfile = "data/CSV/Test/17180958841.csv2"
+    #csvfile = "test.csv"
+    fake_detect_pipeline(csvfile)
 
-    

@@ -4,16 +4,16 @@
 """
 """
 
-import fileio
-import info_print
-from cutclause import SentenceCutter as SC
+from utils import fileio
+from utils import info_print
+from utils.cutclause import SentenceCutter as SC
 
 if __name__=="__main__":
     rid_result = fileio.read_file_to_dict("objective.temp")
-    replica = fileio.read_file_to_list("../data/target/all_replicaId.dat")
+    replica = fileio.read_file_to_list("data/target/all_fake.dat")
     #replica = fileio.read_file_to_list("data/replica_high_freq.dat")
 
-    review_list = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent"])
+    review_list = fileio.read_fields_from_allcsv("data/CSV/Train/",["id","reviewContent"])
 
     rid_review = dict([rid,review] for rid,review in review_list)
 
@@ -23,10 +23,10 @@ if __name__=="__main__":
         i = str(i)
         review = rid_review[i]
         sc = SC(review)
-        if len(sc.cutToClauses()) <= 3:
-            continue
+        #if len(sc.cutToClauses()) <= 3:
+        #    continue
         longreview+=1
-        if rid_result[eval(i)] < 1:
+        if rid_result[eval(i)] < 0.3:
             count+=1
         print i
         print rid_review[i]
@@ -34,7 +34,6 @@ if __name__=="__main__":
         print "*******************************88"
 
     print "total",len(replica)
-    print "longreview",longreview
     print "undetected",count
     print float(count)/longreview
 

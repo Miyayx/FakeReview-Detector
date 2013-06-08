@@ -1,6 +1,8 @@
 #!/usr/bin/env python2.7
 #encoding=utf-8
 
+import sys
+sys.path.append("/home/yang/GraduationProject/utils/")
 from cutclause import SentenceCutter
 import fileio
 
@@ -58,6 +60,7 @@ if __name__=="__main__":
                 continue
             temps[temp]['freq'] = temps[temp]['freq']+1
             temps[temp]['reviews'].append(review)
+            temps[temp]['review_id'].append(r_id)
         else:
             temps[temp] = {'time':t,'freq':1,'reviews':[review],'review_id':[r_id]}
 
@@ -88,13 +91,14 @@ if __name__=="__main__":
     
     #get a dict which k = template and v = reviewlist
     reviewtemps = reviewfunc(newtemps)
-    fileIO.recordToFile('data/temp_and_review.dat',reviewtemps)
+    fileio.record_to_file('data/temp_and_review.dat',reviewtemps)
 
     #get a dict which k = template and v = idlist
     idtemps = idfunc(newtemps)
     fileio.record_to_file('data/temp_and_rid.dat',idtemps)
     replicaId = []
     for k,v in idtemps.items():
+        print k,v
         if len(v)>1:
             replicaId+=v
     fileio.record_to_file('data/replicaId.dat',replicaId)
@@ -105,11 +109,11 @@ if __name__=="__main__":
     
     highfreq = dict((k,v) for k,v in templates if v > 1)
     highfreq= sorted(highfreq.items(),key=lambda d:d[1],reverse=True)
-    fileIO.recordToFile('data/highFreqTemp.dat',highfreq)
+    fileio.record_to_file('data/highFreqTemp.dat',highfreq)
     
     #Sort the templates by its length(the review's length)
     lengthSorted = sorted(newtemps.keys(),key=lambda x:len(x),reverse = True)
-    fileIO.recordToFile('data/lengthSortedTemp.dat',lengthSorted)
+    fileio.record_to_file('data/lengthSortedTemp.dat',lengthSorted)
     
     print "done"
 

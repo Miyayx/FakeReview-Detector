@@ -6,11 +6,11 @@
 
 import sys
 import re
-sys.path.append('/home/yang/GraduationProject/features/')
+sys.path.append('/home/yang/GraduationProject/utils/')
 import fileio
 from cutclause import SentenceCutter as SC
 
-TARGET_WORD_FILE = "../data/target_word.dat"
+TARGET_WORD_FILE = "/home/yang/GraduationProject/data/target_word.dat"
 def read_target_word():
     with open(TARGET_WORD_FILE,'r') as f:
         d = {}
@@ -37,13 +37,14 @@ def get_category_count(cate_word,review):
         for word in cate_word[cate]:
             if word in review:
                 count += 1
+                break
     for word in others:
         if word in review:
             count += 1
     for word in people:
         if word in review:
             count += 1
-            continue
+            break
     if re.match(color,review):
         count += 1
     return count
@@ -54,6 +55,10 @@ def category_value(reviews):
     dict(id:review) -> dict(id:value)
     string -> int
     """
+
+    def norm(v,cnum):
+        return 1 if float(v)/cnum > 1 else float(v)/cnum
+
     #avg = 2.4379 
     avg = float(18) 
     cate_word = read_target_word()
@@ -62,24 +67,34 @@ def category_value(reviews):
     elif isinstance(reviews,list):
         cate_v = [get_category_count(cate_word,r) for r in reviews]
         #avg = float(sum(cate_v))/len(reviews)
-        return [v/avg for v in cate_v]
-        #clause_len = []
-        #for r in reviews:
-        #    sc = SC(r)
-        #    clause_len.append(len(sc.cutToClauses()))
-        #return [float(cate_v[i])/clause_len[i] for i in range(len(reviews))]
+        #return [v/avg for v in cate_v]
+
+        clause_len = []
+        for r in reviews:
+            sc = SC(r)
+            clause_len.append(len(sc.cutToClauses()))
+        return [norm(cate_v[i],clause_len[i]) for i in range(len(reviews))]
 
     elif isinstance(reviews,dict):
         rid_cate = dict([rid,get_category_count(cate_word,review)] for rid,review in reviews.items())
         #avg = float(sum(rid_cate.values()))/len(rid_cate)
-        return dict([k,v/avg] for k,v in rid_cate.items())
-        #clause_len = {}  
-        #for rid,r in reviews.items():
-        #    sc = SC(r)
-        #    clause_len[rid] = len(sc.cutToClauses())
-        #return dict([rid,float(rid_cate[rid])/clause_len[rid]] for rid in reviews.keys())
+        #return dict([k,v/avg] for k,v in rid_cate.items())
+        clause_len = {}  
+        for rid,r in reviews.items():
+            sc = SC(r)
+            clause_len[rid] = len(sc.cutToClauses())
+            if clause_len[rid] == 0:
+                clause_len[rid] = 1 
+        #return dict([rid,norm(rid_cate[rid],clause_len[rid])] for rid in reviews.keys()) 
+        value_max = max(rid_cate.values())
+        value_min = min(rid_cate.values())
+        return dict([rid,(rid_cate[rid]-value_min)/float(value_max-value_min)] for rid in reviews.keys()) 
         
-
+def category_proc(reviewobj):
+    cate_word = read_target_word()
+    reviewobj["category"] = get_category_count(cate_word,reviewobj["content"])
+    return reviewobj["category"]
+    
 if __name__ == "__main__":
     reviewList = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent"])
     rid_review = dict(reviewList)

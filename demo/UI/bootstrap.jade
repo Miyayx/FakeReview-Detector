@@ -1,0 +1,20 @@
+doctype default
+include mixins
+html
+  head
+    block head
+      block meta
+        //- Metadata Section, Encoding & ViewPort
+        meta(charset="utf-8")
+        mixin viewport
+        mixin ua-compatible
+      link(rel="shortcut icon", href="img/favicon.ico")
+      block style
+        mixin stylesheet("css/bootstrap.css")
+        mixin stylesheet("css/bootstrap-responsive.css")
+  body
+    block content
+    block script
+      mixin javascript("js/jquery.js")
+      mixin javascript("js/bootstrap.js")
+      mixin javascript("js/bootbox.min.js")

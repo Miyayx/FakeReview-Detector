@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import random
 
-from features import fileio 
+from utils import fileio 
 from pybrain.datasets import SupervisedDataSet
 
 FEATURE_PATH = "data/features/"

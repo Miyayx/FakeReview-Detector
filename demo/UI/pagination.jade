@@ -1,0 +1,36 @@
+.pagination
+  ul
+    - if(cur == 1) {
+    li.prev-page.disabled: a(href='#') «
+    - }else{
+    li.prev-page: a(href='#') «
+    - }
+
+    - var lower, upper;
+    - if(cur < 3) {
+    -   lower = 1;
+    - }else{
+    -   lower = cur - 2;
+    - }
+    - upper = lower + 4;
+    - if(upper > max) {
+    -   upper = max;
+    - }
+    - lower = upper - 4;
+    - if(lower < 1) {
+    -   lower = 1;
+    - }
+
+    - for(var i = lower; i <= upper; i++) {
+    -   if(i == cur) {
+    li.num-page.active: a(href='#', data-pagenum='#{i}') #{i}
+    -   }else{
+    li.num-page: a(href='#', data-pagenum='#{i}') #{i}
+    -   }
+    - }
+
+    - if(cur == max) {
+    li.next-page.disabled: a(href='#') »
+    - }else{
+    li.next-page: a(href='#') »
+    -}

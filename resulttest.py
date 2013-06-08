@@ -4,7 +4,7 @@
 """
 """
 
-from features import fileio
+from utils import fileio
 
 def recall(target,result):
     count = 0
@@ -12,9 +12,7 @@ def recall(target,result):
     for k,v in target.items():
         if v:
             all_fake+=1
-            print k
             if v == result[k]:
-                print k
                 count += 1
     return float(count)/all_fake
 
@@ -32,5 +30,5 @@ def fvalue(precise,recall):
     return precise*recall*2/(precise+recall)
 
 if __name__ == "__main__":
-    rid_target = fileio.read_file_to_dict("../data/target/all_replicaId.dat")
+    pass
 

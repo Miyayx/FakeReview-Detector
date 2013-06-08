@@ -1,0 +1,43 @@
+extends bootstrap
+append head
+  title 评论
+append style
+append script
+  mixin javascript('js/runtime.min.js')
+  mixin javascript('js/pagination.js')
+  mixin javascript('js/app.js')
+block content
+  .container
+    input#file(type="file",style="display:none")
+    br
+    div.btn-toolbar.controls-row.controls
+      div.btn-group
+        button#one(type="button").btn.btn-primary 检测评论 
+      div.btn-group
+        button#upload(type="button").btn.btn-primary 上传评论文件
+      div.btn-group
+        button#url(type="button").btn.btn-primary 添加产品链接
+    br
+    div#input-show(margin-bottom="30",style="display:none")
+      span(margin-right="100").text-info
+      button#detect(type="button",margin-left="50").btn.btn-primary 开始检测
+    div(margin-bottom="20",margin-top="20")
+      span
+        共
+        span#total-n.badge.badge-inverse 100
+        条评论，检测出
+        span#fake-n.badge.badge-important 20
+        条虚假评论
+        button#filter(type="button").btn.btn-primary.pull-right 所有虚假评论 
+    br
+    .row-fluid
+      table.table.table-striped.table-bordered.table-hover
+        thead
+          tr
+            th 评论id 
+            th 评论内容
+            th 评论者
+            th 评论时间
+        tbody#contents
+    .row-fluid#pages
+
