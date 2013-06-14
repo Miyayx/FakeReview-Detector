@@ -24,7 +24,10 @@ FEATURE_PATH = "../data/features/"
 #ID_FILE='../data/target/test.dat'
 #ID_FILE='../logisticRegression7.log'
 #ID_FILE='../data/target/all_fake.dat'
-ID_FILE='../data/target/suspicion_id2.dat'
+#ID_FILE='../data/target/suspicion_id2.dat'
+#ID_FILE='../data/preprocess/replicaId.dat'
+ID_FILE='../data/preprocess/cluster_rid1.dat'
+
 
 def getIdList(l):
     return [item.strip("\n").split("\t\t")[0] for item in l]

@@ -12,7 +12,7 @@ import sys
 sys.path.append("/home/yang/GraduationProject/")
 import fake_detector
 
-define("port",default=8888,help="run on the given port",type=int)
+define("port",default=12345,help="run on the given port",type=int)
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -40,7 +40,6 @@ class MainHandler(tornado.web.RequestHandler):
 
 class DetectHandler(tornado.web.RequestHandler):
     def get(self):
-        print self
         string = self.get_argument("string",None)
         print string
         if string:

@@ -10,7 +10,8 @@ import fileio
 from cutclause import SentenceCutter as SC
 
 REVIEW_PATH = "../data/CSV/Train/"
-FEATURE_PATH = "../data/features/"
+#FEATURE_PATH = "../data/features/"
+FEATURE_PATH = "../data/new_features/"
 
 def remove_alpha(review):
     sc = SC(review)

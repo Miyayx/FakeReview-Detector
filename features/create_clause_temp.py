@@ -6,12 +6,14 @@ sys.path.append("/home/yang/GraduationProject/utils/")
 from cutclause import SentenceCutter
 import fileio
 
+RECORD_PATH = "../data/preprocess/"
+
 def readClauseFromFile(filename):
     """
     str(filename)-> list of str(subClause)
     """
     l=[]
-    f = open('data/clauseDict.dat','r')
+    f = open(RECORD_PATH+'clause_dict.dat','r')
     while(True):
         line = f.readline()
         if not line:
@@ -33,14 +35,14 @@ def readAllClauseFromFile(filename):
     with open(filename,'r') as f:
         return [line.strip('\n').split('\t\t')[0] for line in f.readlines()]
 
-if __name__=="__main__":
-    clauseList = readClauseFromFile('data/clauseDict.dat') 
-    allClause = readAllClauseFromFile('data/clauseDict.dat')
+def template_process():
+    clauseList = readClauseFromFile(RECORD_PATH+'clause_dict.dat') 
+    allClause = readAllClauseFromFile(RECORD_PATH+'clause_dict.dat')
     print len(clauseList)
     clauseIdDict = setIdToClause(clauseList)
-    fileio.record_to_file('data/clauseIdDict.dat',[(k,clauseList.index(k)+1) for k in clauseList])
-    fileio.record_to_file('data/allClause_id.dat',[(k,allClause.index(k)+1) for k in allClause])
-    fileio.record_to_file('data/all_clauses.dat',allClause)
+    fileio.record_to_file(RECORD_PATH+'clauseIdDict.dat',[(k,clauseList.index(k)+1) for k in clauseList])
+    fileio.record_to_file(RECORD_PATH+'allClause_id.dat',[(k,allClause.index(k)+1) for k in allClause])
+    fileio.record_to_file(RECORD_PATH+'all_clauses.dat',allClause)
     reviewList = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent","reviewTime"])
     temps = {} 
     id_Temp = {}
@@ -74,9 +76,9 @@ if __name__=="__main__":
     idfunc = lambda d:dict([[k,v['review_id']] for k,v in d.iteritems()])
     #write all template into file
     freqtemps = freqfunc(temps)
-    fileio.record_to_file('data/allTemplates.dat',sorted(freqtemps.items(),key=lambda d:d[1],reverse=True))
+    fileio.record_to_file(RECORD_PATH+'allTemplates.dat',sorted(freqtemps.items(),key=lambda d:d[1],reverse=True))
 
-    fileio.record_to_file('data/all_id_temp.dat',sorted(id_Temp.items(),key=lambda d:d[0]))
+    fileio.record_to_file(RECORD_PATH+'all_id_temp.dat',sorted(id_Temp.items(),key=lambda d:d[0]))
 
     #define a filter which help remove the template with little suspect
     #choose the ones which have more than two sentence and not all of them are unique(appear only once) and has at least two no unique sentences
@@ -91,29 +93,37 @@ if __name__=="__main__":
     
     #get a dict which k = template and v = reviewlist
     reviewtemps = reviewfunc(newtemps)
-    fileio.record_to_file('data/temp_and_review.dat',reviewtemps)
+    fileio.record_to_file(RECORD_PATH+'temp_and_review.dat',reviewtemps)
 
     #get a dict which k = template and v = idlist
     idtemps = idfunc(newtemps)
-    fileio.record_to_file('data/temp_and_rid.dat',idtemps)
+    fileio.record_to_file(RECORD_PATH+'temp_and_rid.dat',idtemps)
     replicaId = []
     for k,v in idtemps.items():
         print k,v
         if len(v)>1:
             replicaId+=v
-    fileio.record_to_file('data/replicaId.dat',replicaId)
+    fileio.record_to_file(RECORD_PATH+'replicaId.dat',replicaId)
 
     templates = freqfunc(newtemps)
     templates = sorted(templates.items(),key=lambda d:d[1],reverse=True)
-    fileio.record_to_file('data/template.dat',templates)
+    fileio.record_to_file(RECORD_PATH+'template.dat',templates)
     
     highfreq = dict((k,v) for k,v in templates if v > 1)
     highfreq= sorted(highfreq.items(),key=lambda d:d[1],reverse=True)
-    fileio.record_to_file('data/highFreqTemp.dat',highfreq)
+    fileio.record_to_file(RECORD_PATH+'highFreqTemp.dat',highfreq)
     
     #Sort the templates by its length(the review's length)
     lengthSorted = sorted(newtemps.keys(),key=lambda x:len(x),reverse = True)
-    fileio.record_to_file('data/lengthSortedTemp.dat',lengthSorted)
+    fileio.record_to_file(RECORD_PATH+'lengthSortedTemp.dat',lengthSorted)
     
     print "done"
+
+
+if __name__=="__main__":
+    #template_process()
+    newtemps = fileio.read_file_to_dict(RECORD_PATH+"template.dat")
+    lengthSorted = sorted(newtemps.keys(),key=lambda x:len(x),reverse = True)
+    print lengthSorted
+    fileio.record_to_file(RECORD_PATH+'lengthSortedTemp.dat',lengthSorted)
 

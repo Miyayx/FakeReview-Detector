@@ -39,7 +39,7 @@ def record_to_file(filename,data,mode='w'):
                 except UnicodeEncodeError:
                     f.write('%s\t\t%s\n'%(k.encode('utf-8','ignore'),v.encode('utf-8','ignore')))
     elif isinstance(data,list): 
-        if isinstance(data[0],list):
+        if isinstance(data[0],list) or isinstance(data[0],tuple):
             if len(data[0]) == 1:
                 for item in data:
                     f.write('%s\n'%str(item))
@@ -53,6 +53,9 @@ def record_to_file(filename,data,mode='w'):
                     #except UnicodeDecodeError,AttributeError:
                     except: 
                         f.write('%s\t\t%s\n'%(str(k),str(v)))
+            else:
+                for item in data:
+                    f.write('%s\n'%str(item))
         else:
             for item in data:
                 f.write('%s\n'%str(item))

@@ -5,7 +5,7 @@
 This is the entrance of the whole project
 """
 
-import ReviewCrawler
+from ReviewCrawler import ReviewCrawler
 from utils import fileio
 from utils import jsonparser
 
@@ -16,8 +16,15 @@ import objective
 
 REVIEW_LIST = []
 
+class ParameterTypeError(Exception):
+    def __init__(self,param):
+        Exception.__init__(self,param)
+        self.param = param
+    def __str__(self):
+        return "Parameter is ",self.param
+
 def is_url(s):
-    return True if s.startswith("http://") else False
+    return True if s.startswith("http://") or s.startswith("https://") else False
 
 def is_file(s):
     return True if s.find(".csv") != -1 else False
@@ -29,24 +36,27 @@ def _get_reviews_from_file(filedir):
     return dict(rid_review)
 
 def _get_reviews_from_url(url):
-    r_file = ReviewClawler.main(s)
+    r_file = ReviewCrawler.crawl_producturl(url)
     return _get_reviews_from_file(r_file)
 
 def _get_reviews(s):
-
     rid_review = {}
+    print "type",type(s)
     if isinstance(s,list) or isinstance(s,tuple):
+        print "is list or tuple"
         for i in range(len(s)):
             rid_review[i] = s[i]
-    elif isinstance(s,str):
+    elif isinstance(s,str) or isinstance(s,unicode):
+        print "is_string"
         if is_url(s):
+            print "is_url"
             rid_review = _get_reviews_from_url(s)
         elif is_file(s):
             rid_review = _get_reviews_from_file(s)
         else:
             rid_review[0] = s
     else:
-        raise ParameterTypeError 
+        raise ParameterTypeError(s) 
     return rid_review
 
 review_list_obj = {}
@@ -77,6 +87,14 @@ rule_procs = [
     review_len.length_proc,
     review_sent.sentiment_proc
 ]
+
+def normalize(rid_reviewobj,feature):
+    l = [obj[feature] for obj in rid_reviewobj.values()]
+    Min = min(l)
+    Max = max(l)
+    #return [float(i-Min)/(Max-Min) for i in l]
+    for reviewobj in rid_reviewobj.values():
+        reviewobj[feature] = float(reviewobj[feature]-Min)/(Max-Min)
 
 def print_reviewobj(reviewobj):
     print "=================================="
@@ -114,8 +132,11 @@ def fake_detect_pipeline(s):
         "avg_sent":
         }
     """
-    rid_review = _get_reviews(s) #It's a dict, which key is id from web of review and value is content of review
-    #except ParameterTypeError:
+    try:
+        rid_review = _get_reviews(s) #It's a dict, which key is id from web of review and value is content of review
+    except ParameterTypeError,e:
+        print e
+        return
 
     rid_reviewobj = {}
     reviewlistobj = {}
@@ -136,20 +157,26 @@ def fake_detect_pipeline(s):
         rule_procs[-1](reviewobj,reviewlistobj)
 
     avg_len = sum([obj["length"] for obj in rid_reviewobj.values()])/float(len(rid_reviewobj))
+
     avg_sent = sum([obj["sentiment"] for obj in rid_reviewobj.values()])/float(len(rid_reviewobj))
 
     for rid in rid_reviewobj.keys():
         rid_reviewobj[rid]["length"] = rid_reviewobj[rid]["length"]/avg_len
         rid_reviewobj[rid]["sentiment"] = rid_reviewobj[rid]["sentiment"]/avg_len
 
+    normalize(rid_reviewobj,"length")
+    normalize(rid_reviewobj,"sentiment")
+    normalize(rid_reviewobj,"category")
+
     rid_target = {}
     for rid in rid_reviewobj.keys():
         reviewobj = rid_reviewobj[rid]
-        #print_reviewobj(reviewobj)
-        #print "Result",objective.objective(reviewobj)
-        rid_target[eval(rid)] = objective.objective(reviewobj)
+        print_reviewobj(reviewobj)
+        #result = objective.logistic_objective(reviewobj)
+        result = objective.objective(reviewobj)
+        print "Result",result
+        rid_target[eval(rid)] = result
     print "Review_list",len(REVIEW_LIST)
-    print "rid_target",len(rid_target)
 
     return jsonparser.convert_to_json(REVIEW_LIST,rid_target)
         
@@ -198,7 +225,7 @@ if __name__ == "__main__":
     reviews = [
     "很好的包包，已经第二次买了，全5分",
     "还可以，没有图片上的好看，皮质还可以的，物流也挺快的三天就到了,总体上还算挺满意得。"]
-    csvfile = "data/CSV/Test/17180958841.csv2"
-    #csvfile = "test.csv"
+    #csvfile = "data/CSV/Train/17180958841.csv2"
+    csvfile = "test.csv"
     fake_detect_pipeline(csvfile)
 

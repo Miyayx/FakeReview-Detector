@@ -3,18 +3,33 @@
 """
 
 from utils import fileio 
+import math
+
 FEATURE_PATH = "data/features/"
 
 def objective(reviewobj):
-    result = \
-        0.2*float(reviewobj["url"])+\
-        0.2*float(reviewobj["sentiment"])+\
-        0.3*float(reviewobj["general"])+\
-        0.1*float(reviewobj["length"])+\
-        0.2*float(reviewobj["category"])
+    w = [0.3,0.15,0.1,0.2,0.25]
+    features = [float(reviewobj["url"]),float(reviewobj["sentiment"]),float(reviewobj["general"]),float(reviewobj["general"]),float(reviewobj["length"]),1]
+    result = 0
+    for i in range(len(w)):
+        result+=w[i]*features[i]
 
-    threshold = 1.5
+    threshold = 0.3 
+    print "objective",result
     return True if result > threshold else False
+
+def logistic_objective(reviewobj):
+    #w = [6,4.5,3.5,6,8,-7]
+    w = [10,4.5,3.5,6.8,9,-6.5]
+    features = [float(reviewobj["url"]),float(reviewobj["sentiment"]),float(reviewobj["general"]),float(reviewobj["general"]),float(reviewobj["length"]),1]
+    score = 0
+    for i in range(len(w)):
+        score+=w[i]*features[i]
+    result = 1/(1+math.exp(score))
+
+    threshold = 0.5
+    print "lr_objective",result
+    return True if result < threshold else False
 
 if __name__ == "__main__":
 

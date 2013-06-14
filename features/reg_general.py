@@ -29,8 +29,8 @@ regulars = [
     re.compile(ur"[\u4e00-\u9fa5]*还是一如既往[地|的]"),
     re.compile(ur"(已经)?是?第[\u4e00-\u9fa5|0-9]次[\u4e00-\u9fa5]*(?:买|购买|光顾|来)了?"),
     re.compile(ur"(已经)?是?老(?:顾客|客户)了?"),
-    re.compile(ur"[\u4e00-\u9fa5]*很[\u4e00-\u9fa5]*很(?:喜欢|不错)"),
-    re.compile(ur"[\u4e00-\u9fa5]*很(?:喜欢|满意)"),
+    re.compile(ur"[\u4e00-\u9fa5]+很[\u4e00-\u9fa5]+很(?:喜欢|不错)"),
+    re.compile(ur"[\u4e00-\u9fa5]+很(?:喜欢|满意)"),
     re.compile(ur"好评[\u4e00-\u9fa5|0-9]分"),
     re.compile(ur"[\u4e00-\u9fa5]*也?[挺超]?给力[\u4e00-\u9fa5]"),
     re.compile(ur"这个价[格钱]?买到这样的包"),
@@ -124,8 +124,7 @@ def general_proc(reviewobj):
             if re.match(regular,c):
                 general_count+=1
                 break
-    reviewobj["general"] = general_count
-    return float(general_count)/len(reviewobj["clauses"]) if len(reviewobj["clauses"]) > 0 else 0
+    reviewobj["general"] = float(general_count)/len(reviewobj["clauses"]) if len(reviewobj["clauses"]) > 0 else 0
     
 if __name__=="__main__":
 
@@ -140,10 +139,10 @@ if __name__=="__main__":
     #            if re.match(regular,c):
     #                general_count+=1
     #                break
-    #    ratio = float(general_count)/len(clauses)
+    #    ratio = float(general_count)/len(clauses) if len(clauses) > 0 else 0
     #    print "%s\t\t%f"%(rid,ratio)
 
-    review = "颜色很正！！！包包超值了！！！做工精致，皮质柔软舒服，没有异味，挂牌正规！！！总之是太欢喜啦！！！"
+    review = "很喜欢这个包包"
     sc = SentenceCutter(review)
     clauses = sc.cutToClauses()
     for c in clauses:

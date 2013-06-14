@@ -85,24 +85,24 @@ def calculate_clause_sent(c_ltp):
     def get_polar(relate):
         word_i = c_ltp.relate_list.index(relate)
         word = c_ltp.word_list[word_i]
-        print "polar word",word
+        #print "polar word",word
         return sent_polar(word)
     def get_degree(relate):
         word_i = c_ltp.relate_list.index(relate)
         word = c_ltp.word_list[word_i]
-        print "adv word",word
+        #print "adv word",word
         return get_adv_degree(word)
         
     relate_str = c_ltp.get_clause_relate_path()
-    print relate_str
-    print c_ltp.sentence
+    #print relate_str
+    #print c_ltp.sentence
     if relate_str in subject_paths:
         return 0
     elif "SBV" in c_ltp.relate_list and c_ltp.word_list[c_ltp.relate_list.index('SBV')] in ['赞','贊']:
         return 1
     else:
         if "ADV@ADV@HED" in relate_str:
-            print "if ADV@ADV@HED"
+            #print "if ADV@ADV@HED"
             hed_i = c_ltp.relate_list.index('HED')
             adv_i2 = hed_i -1
             adv_i1 = hed_i -2
@@ -111,22 +111,22 @@ def calculate_clause_sent(c_ltp):
             adv_w1 = c_ltp.word_list[adv_i1]
             adv_w2 = c_ltp.word_list[adv_i2]
 
-            print hed_w
-            print adv_w1
-            print adv_w2
+            ##print hed_w
+            #print adv_w1
+            #print adv_w2
 
             polar = sent_polar(hed_w)
             adv_degree1 = get_adv_degree(adv_w1)
             adv_degree2 = get_adv_degree(adv_w2)
             if polar*adv_degree1*adv_degree2 != 0:
-                print polar*adv_degree1*adv_degree2
+                #print polar*adv_degree1*adv_degree2
                 return polar*adv_degree1*adv_degree2
 
         adv_and_word = ["ADV@HED","ADV@VOB","ADV@VV","HED@CMP"]
 
         for sub_relate in adv_and_word:
             if sub_relate in relate_str: 
-                print sub_relate 
+                #print sub_relate 
                 adv_r,word_r = sub_relate.split("@")
                 word_i = c_ltp.relate_list.index(word_r)
                 adv_i = word_i -1
@@ -136,31 +136,31 @@ def calculate_clause_sent(c_ltp):
                 polar = sent_polar(word_w)
                 adv_degree = get_adv_degree(adv_w)
 
-                print "adv",adv_w
-                print "word",word_w
+                #print "adv",adv_w
+                #print "word",word_w
                 if polar*adv_degree != 0:
-                    print polar*adv_degree
+                    #print polar*adv_degree
                     return polar*adv_degree
 
         if "ADV@DE" in relate_str and "DE" in c_ltp.relate_list:
-            print "if ADV@DE"
+            #print "if ADV@DE"
 
             adv_i = c_ltp.relate_list.index('ADV')
             de_i = c_ltp.relate_list.index('DE')
             adv_w = c_ltp.word_list[adv_i]
             de_w = c_ltp.word_list[de_i]
-            print adv_w
-            print de_w
+            #print adv_w
+            #print de_w
 
             polar = sent_polar(de_w)
             adv_degree = get_adv_degree(adv_w)
 
             if polar*adv_degree != 0: 
-                print polar*adv_degree
+                #print polar*adv_degree
                 return polar*adv_degree
 
         if "HED@VOB" == relate_str:
-            print "if HED@VOB"
+            #print "if HED@VOB"
             hed_i = c_ltp.relate_list.index('HED')
             vob_i = c_ltp.relate_list.index('VOB')
             hed_w = c_ltp.word_list[hed_i]
@@ -173,41 +173,41 @@ def calculate_clause_sent(c_ltp):
             else:
                 adv_degree = get_adv_degree(hed_w)
 
-            print hed_w
-            print vob_w
+            #print hed_w
+            #print vob_w
 
             if polar*adv_degree != 0:
-                print polar*adv_degree
+                #print polar*adv_degree
                 return polar*adv_degree
 
         if "HED" in relate_str:
-            print "if HED"
+            #print "if HED"
             hed_i = c_ltp.relate_list.index('HED')
             hed_w = c_ltp.word_list[hed_i]
             polar = sent_polar(hed_w)
 
-            print hed_w
+            #print hed_w
 
             if polar != 0:
-                print polar
+                #print polar
                 return polar
         if "VOB" in relate_str:
-            print "if VOB"
+            #print "if VOB"
             vob_i = c_ltp.relate_list.index('VOB')
             vob_w = c_ltp.word_list[vob_i]
             polar = sent_polar(vob_w)
-            print vob_w
-            if polar != 0:
-                print polar
+            #print vob_w
+            #if polar != 0:
+                #print polar
         if "VV" in relate_str:
-            print "if VV"
+            #print "if VV"
             vv_i = c_ltp.relate_list.index('VV')
             vv_w = c_ltp.word_list[vv_i]
             polar = sent_polar(vv_w)
 
-            print vv_w
-            if polar != 0:
-                print polar
+            #print vv_w
+            #if polar != 0:
+                #print polar
 
         return 0
 
@@ -259,11 +259,13 @@ def sentiment_proc(reviewobj,reviewlistobj):
 
 
 REVIEW_PATH = "../data/CSV/Train/"
-FEATURE_PATH = "../data/features/"
+#FEATURE_PATH = "../data/features/"
+FEATURE_PATH = "../data/new_features/"
 
 def calculate_sentvalue():
 
-    XML_FILE="../data/parser/all_clause_parse_utf8.dat"
+    #XML_FILE="../data/parser/all_clause_parse_utf8.dat"
+    XML_FILE="../data/preprocess/all_clause_parse_utf8.dat"
     review_sentratio = {}
     rid_sentratio = {}
     rid_sentnorm = {}
@@ -271,7 +273,7 @@ def calculate_sentvalue():
     filenames = os.listdir(REVIEW_PATH)
     for filename in filenames:
         name = ""
-        if not filename.split(".")[1] == "csv2":
+        if not filename.split(".")[1] in ["csv2","csv"]:
             continue
         else:
             name = filename.split(".")[0]

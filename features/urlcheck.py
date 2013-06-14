@@ -71,5 +71,5 @@ if __name__ == "__main__":
     review_list = fileio.read_fields_from_allcsv("../data/CSV/Train/",["id","reviewContent"])
     rid_review = dict(review_list)
     rid_url = dict([rid,int(has_url(review))] for rid,review in rid_review.iteritems())
-    fileio.record_to_file("../data/features/rid_url.dict",rid_url)
+    fileio.record_to_file("../data/new_features/rid_url.dict",rid_url)
 

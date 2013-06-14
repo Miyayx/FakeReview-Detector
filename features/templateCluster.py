@@ -16,10 +16,14 @@ from scipy import sparse
 from scipy.spatial import distance
 from sklearn.metrics.pairwise import pairwise_distances
 
+import sys
+sys.path.append("/home/yang/GraduationProject/utils/")
 import fileio
 
-inputPath='data/'
-ouputPath = 'data/'
+#inputPath='data/'
+#outputPath = 'data/'
+inputPath='../data/preprocess/'
+outputPath = '../data/preprocess/'
 #inputFile='temp_and_id.dat'
 inputFile='lengthSortedTemp.dat'
 clauseFile='clauseIdDict.dat'
@@ -78,8 +82,8 @@ if __name__ == '__main__':
     #print len(X[0])
     start = time.time()
     rowN = len(templates)
-    begin = 10000
-    rowN = rowN-begin
+    begin = 18000
+    rowN = rowN - begin
 
     vectors = [turnTemplateToVector((templates[i]),total) for i in range(begin,begin+rowN)]
     print "vector -> array"
@@ -105,9 +109,11 @@ if __name__ == '__main__':
     #print time.time()-start
     #print mtx.getnnz()
     #print mtx.shape[0]
+
+    vectors = None
     
     print "Begin DBSCAN"
-    db = DBSCAN(eps=0.4,min_samples=2,metric="precomputed").fit(dist)
+    db = DBSCAN(eps=0.5,min_samples=2,metric="precomputed").fit(dist)
     core_samples = db.core_sample_indices_
     labels = db.labels_
     # Number of clusters in labels, ignoring noise if present.
@@ -142,8 +148,8 @@ if __name__ == '__main__':
     print "\n"
     #print genericTmp
 
-    fileio.record_to_file('data/new_generic_tmp2.dat',genericTmp)
-    fileio.record_to_file('data/new_replicaId2.dat',replicaId)
+    fileio.record_to_file(outputPath+'generic_tmp3.dat',genericTmp)
+    fileio.record_to_file(outputPath+'cluster_rid3.dat',replicaId)
 
 
     #db = DBSCAN(eps=2.5,min_samples=2).fit(mtx.toarray())
