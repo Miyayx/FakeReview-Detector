@@ -41,13 +41,10 @@ def _get_reviews_from_url(url):
 
 def _get_reviews(s):
     rid_review = {}
-    print "type",type(s)
     if isinstance(s,list) or isinstance(s,tuple):
-        print "is list or tuple"
         for i in range(len(s)):
             rid_review[i] = s[i]
     elif isinstance(s,str) or isinstance(s,unicode):
-        print "is_string"
         if is_url(s):
             print "is_url"
             rid_review = _get_reviews_from_url(s)
@@ -77,8 +74,8 @@ def cut_clause(string):
 from features import urlcheck 
 from sentiment_analysis import review_sent 
 from features import reg_general 
-from detail_description import detail_category 
-from detail_description import review_len 
+from features import detail_category 
+from features import review_len 
 
 rule_procs = [
     urlcheck.url_proc,

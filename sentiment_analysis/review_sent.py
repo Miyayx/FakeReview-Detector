@@ -8,7 +8,6 @@ from xml.dom.minidom import parse,parseString
 import sys
 import os
 import codecs
-import matplotlib.pyplot as plt
 import numpy as np
 
 sys.path.append('/home/yang/GraduationProject/utils/')
